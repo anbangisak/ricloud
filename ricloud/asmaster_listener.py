@@ -4,7 +4,7 @@ import json
 import shutil
 import logging
 import hashlib
-import MySQLdb
+import psycopg2
 
 from .ricloud import RiCloud
 from .listener import Listener
@@ -35,21 +35,21 @@ class DatabaseWrtingHandler(RiCloudHandler):
     @property
     def db_con(self):
         if not self._db_con:
-            self._db_con = MySQLdb.connect(
+            self._db_con = psycopg2.connect(
                 host=conf.LISTENER_DB_HOST,
                 port=int(conf.LISTENER_DB_PORT),
                 user=conf.LISTENER_DB_USER,
-                passwd=conf.LISTENER_DB_PASSWORD,
-                db=self.db
+                password=conf.LISTENER_DB_PASSWORD,
+                dbname=self.db
             )
         return self._db_con
 
     def handle_query(self, query, args=None, retry=2):
         try:
             cursor = self.db_con.cursor()
-            cursor.execute(query, args=args)
+            cursor.execute(query, args)
             self.db_con.commit()
-        except (AttributeError, MySQLdb.OperationalError):
+        except (AttributeError, psycopg2.OperationalError):
             if not retry:
                 raise
 
@@ -68,7 +68,7 @@ class DatabaseWrtingHandler(RiCloudHandler):
                 code = None
 
             query = """
-                INSERT INTO system (`received`, `headers`, `body`, `message`, `code`)
+                INSERT INTO system (received, headers, body, message, code)
                 VALUES (NOW(), %(headers)s, %(body)s, %(message)s, %(code)s)
             """
 
@@ -91,7 +91,7 @@ class DatabaseWrtingHandler(RiCloudHandler):
                 table = header['type']
 
             query = """
-                INSERT INTO {table} (`service`, `received`, `account_id`, `device_id`, `device_tag`, `headers`, `body`)
+                INSERT INTO {table} (service, received, account_id, device_id, device_tag, headers, body)
                 VALUES (%(service)s, NOW(), %(account_id)s, %(device_id)s, %(device_tag)s, %(headers)s, %(body)s)
             """.format(table=table)  # noqa
 
@@ -118,7 +118,7 @@ class DatabaseWrtingHandler(RiCloudHandler):
             file_path = self.save_stream_to_file(header, stream, self.file_location)
 
             query = """
-                INSERT INTO file (`service`, `received`, `account_id`, `device_id`, `device_tag`, `headers`, `location`, `file_id`)
+                INSERT INTO file (service, received, account_id, device_id, device_tag, headers, location, file_id)
                 VALUES (%(service)s, NOW(), %(account_id)s, %(device_id)s, %(device_tag)s, %(headers)s, %(location)s, %(file_id)s)
             """  # noqa
 

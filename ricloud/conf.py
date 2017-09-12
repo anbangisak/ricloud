@@ -30,8 +30,8 @@ DEFAULT_LOG = os.path.join(LOG_DIRECTORY, 'ricloud.log')
 
 LOGGING_LEVEL = settings.get('logging', 'level')
 
-LISTENER_DB_HOST = settings.get('mysql', 'host')
-LISTENER_DB_PORT = settings.get('mysql', 'port')
-LISTENER_DB_NAME = settings.get('mysql', 'database')
-LISTENER_DB_USER = settings.get('mysql', 'username')
-LISTENER_DB_PASSWORD = settings.get('mysql', 'password')
+LISTENER_DB_HOST = settings.get('postgres', 'host')
+LISTENER_DB_PORT = settings.get('postgres', 'port')
+LISTENER_DB_NAME = settings.get('postgres', 'database')
+LISTENER_DB_USER = settings.get('postgres', 'username')
+LISTENER_DB_PASSWORD = settings.get('postgres', 'password')
