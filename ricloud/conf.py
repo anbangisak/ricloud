@@ -35,3 +35,5 @@ LISTENER_DB_PORT = settings.get('postgres', 'port')
 LISTENER_DB_NAME = settings.get('postgres', 'database')
 LISTENER_DB_USER = settings.get('postgres', 'username')
 LISTENER_DB_PASSWORD = settings.get('postgres', 'password')
+
+TEMPORARY_FILES_PATH = settings.get('temp_files', 'path')

@@ -1,7 +1,7 @@
 from cStringIO import StringIO
 import tempfile
 import os
-
+from . import conf
 
 class StreamError(Exception):
 
@@ -51,7 +51,7 @@ class ChunkedDataHandler(HandlerBase):
 
     def _get_stream(self, id):
         if id not in self.tmp_handles:
-            self.tmp_handles[id] = tempfile.TemporaryFile()
+            self.tmp_handles[id] = tempfile.TemporaryFile(dir=conf.TEMPORARY_FILES_PATH)
         return self.tmp_handles[id]
 
     def on_complete_message(self, header, payload):
