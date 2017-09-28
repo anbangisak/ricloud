@@ -15,11 +15,12 @@ from .handlers import RiCloudHandler
 class RiCloud(object):
     """Primary class for dealing with the ricloud API/"""
 
-    def __init__(self, api=None, listener=None):
-        self.api = api or Api()
+    def __init__(self, api=None, listener=None, relay=False):
+        self.api = api or Api(relay)
         self.api.setup()
         self.listener = listener or Listener({'__ALL__': RiCloudHandler(api=self.api)})
         self.services = self.api.allowed_services()
+        self.relay = relay
         if self.api.retrieval_protocol == "asstore":
             self.object_store_thread.start()
         else:
@@ -31,8 +32,12 @@ class RiCloud(object):
 
     @cached_property
     def stream_thread(self):
-        stream = settings.get('stream', 'stream_endpoint')
-        token = settings.get('auth', 'token')
+        if self.relay:
+            stream = settings.get('stream', 'stream_endpoint_relay')
+            token = settings.get('auth', 'token_relay')
+        else:
+            stream = settings.get('stream', 'stream_endpoint')
+            token = settings.get('auth', 'token')
 
         def _start():
             s = Stream(

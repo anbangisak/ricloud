@@ -13,10 +13,11 @@ from . import conf
 
 
 class AsmasterListener(RiCloud):
-    def __init__(self, timeout):
+    def __init__(self, timeout, relay=False):
         self.timeout = timeout
         super(AsmasterListener, self).__init__(
             listener=Listener({'__ALL__': DatabaseWrtingHandler()}),
+            relay=relay,
         )
 
     @property

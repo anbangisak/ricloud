@@ -12,9 +12,13 @@ from .conf import settings
 class Api(object):
     """Primary object that pushes requests into a distinct stream thread."""
 
-    def __init__(self):
+    def __init__(self, relay=False):
+        if relay:
+            self.token = settings.get('auth', 'token_relay')
+        else:
+            self.token = settings.get('auth', 'token')
+
         self.host = settings.get('hosts', 'api_host')
-        self.token = settings.get('auth', 'token')
 
         self.account_info_endpoint = '%s%s' % (self.host, settings.get('endpoints', 'account_information'))
         self.register_account_endpoint = '%s%s' % (self.host, settings.get('endpoints', 'register_account'))

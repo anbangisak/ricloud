@@ -11,10 +11,13 @@ from .conf import settings
 class AsmasterApi(object):
     """Primary object that pushes requests into a distinct stream thread."""
 
-    def __init__(self, timeout):
+    def __init__(self, timeout, relay=False):
         self.timeout = timeout
         self.host = settings.get('hosts', 'asmaster_host')
-        self.token = settings.get('auth', 'token')
+        if relay:
+            self.token = settings.get('auth', 'token_relay')
+        else:
+            self.token = settings.get('auth', 'token')
 
         self.list_services_endpoint = self._build_endpoint('list_services')
         self.list_subscriptions_endpoint = self._build_endpoint('list_subscriptions')

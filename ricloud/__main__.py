@@ -2,18 +2,18 @@
 
 Usage:
     ricloud <account> [--password=<password>] [--timeout=<timeout>]
-    ricloud --listen [--timeout=<timeout>]
-    ricloud --list-services [--timeout=<timeout>]
-    ricloud --list-subscriptions <service> [--timeout=<timeout>]
-    ricloud --subscribe-account <username> <password> <service> [--timeout=<timeout>]
-    ricloud --perform-2fa-challenge <account_id> <device_id> [--timeout=<timeout>]
-    ricloud --submit-2fa-challenge <account_id> <code> [--timeout=<timeout>]
-    ricloud --resubscribe-account <account_id> <password> [--timeout=<timeout>]
-    ricloud --unsubscribe-account <account_id> [--timeout=<timeout>]
-    ricloud --list-devices <account_id> [--timeout=<timeout>]
-    ricloud --subscribe-device <account_id> <device_id> [--timeout=<timeout>]
-    ricloud --unsubscribe-device <account_id> <device_id> [--timeout=<timeout>]
-    ricloud --reset-subscription-since <account_id> <datetime> [--timeout=<timeout>]
+    ricloud --listen [--timeout=<timeout>] [--relay=<relay>]
+    ricloud --list-services [--timeout=<timeout>] [--relay=<relay>]
+    ricloud --list-subscriptions <service> [--timeout=<timeout>] [--relay=<relay>]
+    ricloud --subscribe-account <username> <password> <service> [--timeout=<timeout>] [--relay=<relay>]
+    ricloud --perform-2fa-challenge <account_id> <device_id> [--timeout=<timeout>] [--relay=<relay>]
+    ricloud --submit-2fa-challenge <account_id> <code> [--timeout=<timeout>] [--relay=<relay>]
+    ricloud --resubscribe-account <account_id> <password> [--timeout=<timeout>] [--relay=<relay>]
+    ricloud --unsubscribe-account <account_id> [--timeout=<timeout>] [--relay=<relay>]
+    ricloud --list-devices <account_id> [--timeout=<timeout>] [--relay=<relay>]
+    ricloud --subscribe-device <account_id> <device_id> [--timeout=<timeout>] [--relay=<relay>]
+    ricloud --unsubscribe-device <account_id> <device_id> [--timeout=<timeout>] [--relay=<relay>]
+    ricloud --reset-subscription-since <account_id> <datetime> [--timeout=<timeout>] [--relay=<relay>]
     ricloud --help
 
 
@@ -57,11 +57,14 @@ from .utils import select_service, select_samples
 
 def _parse_input_arguments(arguments):
     timeout = int(arguments.get('--timeout') or 600)
+    relay = True or False if (arguments.get(
+        '--relay') and arguments.get('--relay') == "True") else False
 
     if arguments['--listen']:
         return {
             'mode': 'listen',
             'timeout': timeout,
+            'relay': relay,
         }
 
     manager_mode_actions = [
@@ -83,6 +86,7 @@ def _parse_input_arguments(arguments):
             return {
                 'mode': 'manager',
                 'timeout': timeout,
+                'relay': relay,
             }
 
     account = arguments['<account>']
@@ -93,6 +97,7 @@ def _parse_input_arguments(arguments):
         'account': account,
         'password': password,
         'timeout': timeout,
+        'relay': relay,
     }
 
 
@@ -131,10 +136,12 @@ def main():
         from .asmaster_listener import AsmasterListener
 
         # This sets the listener running and will not return
-        AsmasterListener(application_payload['timeout'])
+        AsmasterListener(
+            application_payload['timeout'], relay=application_payload['relay'])
 
     elif application_payload['mode'] == 'manager':
-        api = AsmasterApi(application_payload['timeout'])
+        api = AsmasterApi(
+            application_payload['timeout'], relay=application_payload['relay'])
         api.setup()
 
         if(arguments["--list-services"]):
