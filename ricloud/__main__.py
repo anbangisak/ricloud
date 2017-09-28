@@ -57,7 +57,7 @@ from .utils import select_service, select_samples
 
 def _parse_input_arguments(arguments):
     timeout = int(arguments.get('--timeout') or 600)
-    relay = True or False if (arguments.get(
+    relay = True if (arguments.get(
         '--relay') and arguments.get('--relay') == "True") else False
 
     if arguments['--listen']:
